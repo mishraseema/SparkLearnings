@@ -11,9 +11,13 @@ object HelloSpark extends Serializable{
 
     logger.info("Start spark")
 
+    //refer https://spark.apache.org/docs/latest/configuration.html for config proprties
+    val sparkConf = new SparkConf()
+    sparkConf.set("spark.app.name", "Hello Spark")
+    sparkConf.set("spark.master", "local[3]")
+
     val spark = SparkSession.builder()
-      .appName("Hello Spark")
-      .master("local[3]")
+      .config(sparkConf)
       .getOrCreate()
 
     logger.info("Stop spark")
