@@ -4,6 +4,8 @@ import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
+import java.util.Properties
+
 object HelloSpark extends Serializable{
 
   @transient lazy val logger:Logger = Logger.getLogger(getClass.getName)
@@ -11,13 +13,8 @@ object HelloSpark extends Serializable{
 
     logger.info("Start spark")
 
-    //refer https://spark.apache.org/docs/latest/configuration.html for config proprties
-    val sparkConf = new SparkConf()
-    sparkConf.set("spark.app.name", "Hello Spark")
-    sparkConf.set("spark.master", "local[3]")
-
     val spark = SparkSession.builder()
-      .config(sparkConf)
+      .config(getSparkConf)
       .getOrCreate()
 
     logger.info("Stop spark")
@@ -25,5 +22,18 @@ object HelloSpark extends Serializable{
 
   }
 
+  def getSparkConf: SparkConf = {
+    val conf = new SparkConf
+    
+    val props = new Properties
+    import scala.io.Source
+    props.load(Source.fromFile("sparkconf").bufferedReader())
+
+    import scala.collection.JavaConverters._
+    props.asScala.foreach(kv => conf.set(kv._1, kv._2))
+
+    conf
+
+  }
 
 }
